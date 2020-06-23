@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="CodFlix" type="Application" factoryName="Application">
+    <envs>
+      <env name="CODFLIX_DB_HOST" value="localhost:3306" />
+      <env name="CODFLIX_DB_USER" value="codflix" />
+      <env name="CODFLIX_DB_PASSWORD" value="codflix" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.codflix.backend.App" />
+    <module name="codflix-backend.main" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

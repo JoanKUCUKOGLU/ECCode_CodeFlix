@@ -4,7 +4,6 @@ import com.codflix.backend.core.Template;
 import com.codflix.backend.models.Media;
 import spark.Request;
 import spark.Response;
-import spark.Session;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,7 @@ public class MediaController {
     public String list(Request request, Response response) {
         List<Media> medias;
 
-        String title = request.queryParams("titl");
+        String title = request.queryParams("title");
 
         if (title != null && !title.isEmpty()) {
             medias = mediaDao.filterMedias(title);

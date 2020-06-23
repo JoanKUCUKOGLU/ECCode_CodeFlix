@@ -1,0 +1,21 @@
+/**********
+* Media details rules
+**********/
+
+.infos {
+    display: flex;
+}
+
+.cover {
+    display: block;
+    width: 20%;
+    height: auto;
+    filter: none;
+}
+  
+/* For width 1000px max (phone device) : */
+@media only screen and (max-width: 1000px) {
+    .cover {
+        display: none;
+    }
+}

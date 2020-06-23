@@ -14,13 +14,19 @@ public class MediaDao {
 
     public List<Media> getAllMedias() {
         List<Media> medias = new ArrayList<>();
+        Media currMedia = null;
 
         Connection connection = Database.get().getConnection();
         try {
             Statement st = connection.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM media ORDER BY release_date DESC");
+            ResultSet rs = st.executeQuery("SELECT media.*, genre.name FROM media LEFT JOIN media_genre ON media_genre.media_id = media.id LEFT JOIN genre ON genre.id = media_genre.genre_id ORDER BY release_date DESC, id ASC;");
             while (rs.next()) {
-                medias.add(mapToMedia(rs));
+                if(currMedia == null || currMedia.getId() != rs.getInt(1)) {
+                    currMedia = mapToMedia(rs);
+                    medias.add(currMedia);
+                }
+                medias.get(medias.size()-1).addGenre(rs.getString(10));
+
             }
         } catch (SQLException | ParseException e) {
             e.printStackTrace();
@@ -31,14 +37,19 @@ public class MediaDao {
 
     public List<Media> filterMedias(String title) {
         List<Media> medias = new ArrayList<>();
+        Media currMedia = null;
 
         Connection connection = Database.get().getConnection();
         try {
-            PreparedStatement st = connection.prepareStatement("SELECT * FROM media WHERE title=? ORDER BY release_date DESC");
-            st.setString(1, title);
+            PreparedStatement st = connection.prepareStatement("SELECT media.*, genre.name FROM media LEFT JOIN media_genre ON media_genre.media_id = media.id LEFT JOIN genre ON genre.id = media_genre.genre_id WHERE title LIKE ? ORDER BY release_date DESC, id ASC;");
+            st.setString(1, "%" + title + "%");
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                medias.add(mapToMedia(rs));
+                if(currMedia == null || currMedia.getId() != rs.getInt(1)) {
+                    currMedia = mapToMedia(rs);
+                    medias.add(currMedia);
+                }
+                medias.get(medias.size()-1).addGenre(rs.getString(10));
             }
         } catch (SQLException | ParseException e) {
             e.printStackTrace();
@@ -49,34 +60,41 @@ public class MediaDao {
 
     public Media getMediaById(int id) {
         Media media = null;
+        List<String> genreList = new ArrayList<>();
 
         Connection connection = Database.get().getConnection();
         try {
-            PreparedStatement st = connection.prepareStatement("SELECT * FROM media WHERE id=?");
-
+            PreparedStatement st = connection.prepareStatement("SELECT media.*, genre.name FROM media LEFT JOIN media_genre ON media_genre.media_id = media.id LEFT JOIN genre ON genre.id = media_genre.genre_id WHERE media.id = ?;");
             st.setInt(1, id);
-
             ResultSet rs = st.executeQuery();
-            if (rs.next()) {
-                media = mapToMedia(rs);
+
+            while (rs.next()) {
+                if(media == null) {
+                    media = mapToMedia(rs);
+                }
+                genreList.add(rs.getString(10));
+            }
+            if(media != null) {
+                media.setGenreList(genreList);
             }
         } catch (SQLException | ParseException e) {
             e.printStackTrace();
         }
-
         return media;
     }
 
     private Media mapToMedia(ResultSet rs) throws SQLException, ParseException {
         return new Media(
                 rs.getInt(1), // id
-                rs.getInt(2), // genre_id
-                rs.getString(3), // title
-                rs.getString(4), // type
-                rs.getString(5), // status
-                DATE_FORMAT.parse(rs.getString(6)), // release_date
-                rs.getString(7), // summary
-                rs.getString(8) // trailer_url
+                new ArrayList<>(), // genre list
+                rs.getString(2), // title
+                rs.getString(3), // type
+                rs.getString(4), // status
+                DATE_FORMAT.parse(rs.getString(5)), // release_date
+                rs.getString(6), // summary
+                rs.getInt(7),
+                rs.getString(8),
+                rs.getString(9) // trailer_url
         );
     }
 }
