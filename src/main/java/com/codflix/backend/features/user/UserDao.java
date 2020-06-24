@@ -30,14 +30,6 @@ public class UserDao {
         return user;
     }
 
-    private User mapToUser(ResultSet rs) throws SQLException {
-        return new User(
-                rs.getInt(1), // id
-                rs.getString(2), // email
-                rs.getString(3) // password
-        );
-    }
-
     public User getUserById(int userId) {
         User user = null;
 
@@ -56,5 +48,45 @@ public class UserDao {
         }
 
         return user;
+    }
+
+    public User getUserByEmail(String email) {
+        User user = null;
+
+        Connection connection = Database.get().getConnection();
+        try {
+            PreparedStatement st = connection.prepareStatement("SELECT * FROM user WHERE email=?");
+
+            st.setString(1, email);
+
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                user = mapToUser(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+
+    public void createNewUser(String email, String hashedPassword) {
+        Connection connection = Database.get().getConnection();
+        try {
+            PreparedStatement st = connection.prepareStatement("INSERT INTO user VALUES (null, ?, ?);");
+            st.setString(1, email);
+            st.setString(2, hashedPassword);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private User mapToUser(ResultSet rs) throws SQLException {
+        return new User(
+                rs.getInt(1), // id
+                rs.getString(2), // email
+                rs.getString(3) // password
+        );
     }
 }

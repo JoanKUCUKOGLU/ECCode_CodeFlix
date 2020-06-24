@@ -4,11 +4,25 @@
 <div class="infos">
     <iframe allowfullscreen yframeborder="0" src="$media.getTrailerUrl()" ></iframe>
     <div>
-        <div>$media.getType()</div>
         <h1>$media.getTitle()</h1>
         <div>$media.getDurationString() / $media.getGenreString()</div>
     </div>
 </div>
 <div>$media.getSummary()</div>
 
+
+<div>
+    #foreach($saison in $saisons)
+        <div>Saison $saison[0].getSaisonIndex()</div>
+        <div class="media-list">
+            #foreach($episode in $saison)
+                <a class="item" href="#">
+                    <div class="title">
+                        $episode.getEpisodeIndex() | $episode.getName() - $episode.getDurationString()
+                    </div>
+                </a>
+            #end
+        </div>
+    #end
+</div>
 #end

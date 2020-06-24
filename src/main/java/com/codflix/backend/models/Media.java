@@ -7,20 +7,20 @@ public class Media {
     private int id;
     private List<String> genreList;
     private String title;
-    private String type;
+    private int typeId;
     private String status;
     private Date releaseDate;
     private String summary;
-    private Integer duration; // in minutes
+    private int duration; // in minutes
     private String imgUrl;
     private String trailerUrl;
 
-    public Media(int id, List<String> genreList, String title, String type, String status,
-                 Date releaseDate, String summary, Integer duration, String imgUrl, String trailerUrl) {
+    public Media(int id, List<String> genreList, String title, int typeId, String status,
+                 Date releaseDate, String summary, int duration, String imgUrl, String trailerUrl) {
         this.id = id;
         this.genreList = genreList;
         this.title = title;
-        this.type = type;
+        this.typeId = typeId;
         this.status = status;
         this.releaseDate = releaseDate;
         this.summary = summary;
@@ -35,7 +35,7 @@ public class Media {
                 "id=" + id +
                 ", genreList=" + getGenreString() +
                 ", title='" + title + '\'' +
-                ", type='" + type + '\'' +
+                ", typeId='" + typeId + '\'' +
                 ", status='" + status + '\'' +
                 ", releaseDate=" + releaseDate +
                 ", summary='" + summary + '\'' +
@@ -77,12 +77,12 @@ public class Media {
         this.title = title;
     }
 
-    public String getType() {
-        return type;
+    public int getTypeId() {
+        return typeId;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTypeId(int typeId) {
+        this.typeId = typeId;
     }
 
     public String getStatus() {
@@ -109,15 +109,19 @@ public class Media {
         this.summary = summary;
     }
 
-    public Integer getDuration() {
+    public int getDuration() {
         return duration;
     }
 
     public String getDurationString() {
-        return (int)(duration/60) + "m" + duration%60;
+        String durationString = "";
+        durationString += (int)(duration/1440) > 0 ? (int)(duration/1440) + "d" : "";
+        durationString += (int)(duration/60) > 0 ? (int)(duration/60) + "h" : "";
+        durationString += duration%60 + (duration < 60 ? "m" : "");
+        return durationString;
     }
 
-    public void setDuration(Integer duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 

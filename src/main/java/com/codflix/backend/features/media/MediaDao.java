@@ -1,6 +1,7 @@
 package com.codflix.backend.features.media;
 
 import com.codflix.backend.core.Database;
+import com.codflix.backend.features.episode.EpisodeDao;
 import com.codflix.backend.models.Media;
 
 import java.sql.*;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MediaDao {
+    private final EpisodeDao episodeDao = new EpisodeDao();
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     public List<Media> getAllMedias() {
@@ -23,8 +25,12 @@ public class MediaDao {
             while (rs.next()) {
                 if(currMedia == null || currMedia.getId() != rs.getInt(1)) {
                     currMedia = mapToMedia(rs);
+                    if(currMedia.getDuration() == 0) {
+                        currMedia.setDuration(episodeDao.getTotalDuration(currMedia.getId()));
+                    }
                     medias.add(currMedia);
                 }
+
                 medias.get(medias.size()-1).addGenre(rs.getString(10));
 
             }
@@ -47,6 +53,9 @@ public class MediaDao {
             while (rs.next()) {
                 if(currMedia == null || currMedia.getId() != rs.getInt(1)) {
                     currMedia = mapToMedia(rs);
+                    if(currMedia.getDuration() == 0) {
+                        currMedia.setDuration(episodeDao.getTotalDuration(currMedia.getId()));
+                    }
                     medias.add(currMedia);
                 }
                 medias.get(medias.size()-1).addGenre(rs.getString(10));
@@ -71,6 +80,9 @@ public class MediaDao {
             while (rs.next()) {
                 if(media == null) {
                     media = mapToMedia(rs);
+                    if(media.getDuration() == 0) {
+                        media.setDuration(episodeDao.getTotalDuration(media.getId()));
+                    }
                 }
                 genreList.add(rs.getString(10));
             }
@@ -88,7 +100,7 @@ public class MediaDao {
                 rs.getInt(1), // id
                 new ArrayList<>(), // genre list
                 rs.getString(2), // title
-                rs.getString(3), // type
+                rs.getInt(3), // type
                 rs.getString(4), // status
                 DATE_FORMAT.parse(rs.getString(5)), // release_date
                 rs.getString(6), // summary
