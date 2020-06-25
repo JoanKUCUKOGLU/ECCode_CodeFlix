@@ -2,6 +2,7 @@ package com.codflix.backend.features.user;
 
 import com.codflix.backend.core.Database;
 import com.codflix.backend.models.User;
+import com.codflix.backend.utils.GlobalData;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -76,6 +77,41 @@ public class UserDao {
             PreparedStatement st = connection.prepareStatement("INSERT INTO user VALUES (null, ?, ?);");
             st.setString(1, email);
             st.setString(2, hashedPassword);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateUserEmail(String email) {
+        Connection connection = Database.get().getConnection();
+        try {
+            PreparedStatement st = connection.prepareStatement("UPDATE user SET email = ? WHERE id = (SELECT id FROM user WHERE email = ?);");
+            st.setString(1, email);
+            st.setString(2, GlobalData.getInstance().getCurrentUser().getEmail());
+            st.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateUserPassword(String password) {
+        Connection connection = Database.get().getConnection();
+        try {
+            PreparedStatement st = connection.prepareStatement("UPDATE user SET password = ? WHERE id = (SELECT id FROM user WHERE email = ?);");
+            st.setString(1, password);
+            st.setString(2, GlobalData.getInstance().getCurrentUser().getEmail());
+            st.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteUser(int id) {
+        Connection connection = Database.get().getConnection();
+        try {
+            PreparedStatement st = connection.prepareStatement("DELETE FROM user WHERE id = ?;");
+            st.setInt(1, id);
             st.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

@@ -3,6 +3,7 @@ package com.codflix.backend.features.user;
 import com.codflix.backend.core.Conf;
 import com.codflix.backend.core.Template;
 import com.codflix.backend.models.User;
+import com.codflix.backend.utils.GlobalData;
 import com.codflix.backend.utils.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class AuthController {
+public class UserController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserDao userDao = new UserDao();
 
@@ -51,6 +52,7 @@ public class AuthController {
         }
 
         // Create session
+        GlobalData.getInstance().login(user);
         Session session = request.session(true);
         session.attribute("user_id", user.getId());
         response.cookie("/", "user_id", "" + user.getId(), 3600, true);
@@ -104,6 +106,7 @@ public class AuthController {
         }
 
         // Create session
+        GlobalData.getInstance().login(user);
         Session session = request.session(true);
         session.attribute("user_id", user.getId());
         response.cookie("/", "user_id", "" + user.getId(), 3600, true);
@@ -114,7 +117,68 @@ public class AuthController {
         return "CREATED";
     }
 
+    public String detail(Request request, Response response, String type) {
+        if(request.requestMethod().equals("GET")) {
+            Map<String, Object> model = new HashMap<>();
+            model.put("currentUser", GlobalData.getInstance().getCurrentUser());
+            return Template.render("user.html", model);
+        }
+
+        Map<String, String> query = URLUtils.decodeQuery(request.body());
+
+        if(type == "updateEmail") {
+            String email = query.get("email");
+            String password = query.get("password");
+
+            try {
+                if(isEmailValid(email) && hashToSHA256(password).equals(GlobalData.getInstance().getCurrentUser().getPassword())) {
+                    userDao.updateUserEmail(email);
+                    GlobalData.getInstance().getCurrentUser().setEmail(email);
+                    response.redirect("/user");
+                    return "OK";
+                }
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+        } else if (type == "updatePassword") {
+            String oldPassword = query.get("old_password");
+            String newPassword = query.get("new_password");
+            String newPasswordConfirmation = query.get("new_password_confirmation");
+
+            try {
+                if(hashToSHA256(oldPassword).equals(GlobalData.getInstance().getCurrentUser().getPassword()) &&
+                        isPasswordValid(newPassword) && newPassword.equals(newPasswordConfirmation)) {
+                    newPassword = hashToSHA256(newPassword);
+                    userDao.updateUserPassword(newPassword);
+                    GlobalData.getInstance().getCurrentUser().setPassword(newPassword);
+                    response.redirect("/user");
+                    return "OK";
+                }
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+            return "OK";
+        }
+
+        return "KO";
+    }
+
     public String logout(Request request, Response response) {
+        GlobalData.getInstance().logout();
+        Session session = request.session(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        response.removeCookie("session");
+        response.removeCookie("JSESSIONID");
+        response.redirect("/");
+
+        return "";
+    }
+
+    public String delete(Request request, Response response) {
+        userDao.deleteUser(GlobalData.getInstance().getCurrentUser().getId());
+        GlobalData.getInstance().logout();
         Session session = request.session(false);
         if (session != null) {
             session.invalidate();
@@ -127,7 +191,6 @@ public class AuthController {
     }
 
     private String hashToSHA256(String password) throws NoSuchAlgorithmException {
-        password = "123456";
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
 

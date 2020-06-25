@@ -8,7 +8,7 @@ import com.codflix.backend.features.history.HistoryController;
 import com.codflix.backend.features.media.MediaController;
 import com.codflix.backend.features.other.ContactController;
 import com.codflix.backend.features.other.HomeController;
-import com.codflix.backend.features.user.AuthController;
+import com.codflix.backend.features.user.UserController;
 import com.codflix.backend.middlewares.AuthMiddleware;
 import com.codflix.backend.middlewares.LoggerMiddleware;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class App {
         // Controllers
         // Additional controllers should be declared and used here
         HomeController home = new HomeController();
-        AuthController auth = new AuthController();
+        UserController user = new UserController();
         GenreController genre = new GenreController();
         MediaController media = new MediaController();
         ContactController contact = new ContactController();
@@ -38,13 +38,17 @@ public class App {
         // Routes
         // Every request should be mapped here to a controller method
         logger.info("Welcome to CodFlix Backend!");
-        Spark.get("/login", (req, res) -> auth.login(req, res));
-        Spark.post("login", (req, res) -> auth.login(req, res));
-        Spark.get("/signup", (req, res) -> auth.signUp(req, res));
-        Spark.post("signup", (req, res) -> auth.signUp(req, res));
-        Spark.get("logout", (req, res) -> auth.logout(req, res));
+        Spark.get("/login", (req, res) -> user.login(req, res));
+        Spark.post("login", (req, res) -> user.login(req, res));
+        Spark.get("/signup", (req, res) -> user.signUp(req, res));
+        Spark.post("signup", (req, res) -> user.signUp(req, res));
+        Spark.get("logout", (req, res) -> user.logout(req, res));
 
         Spark.get("/genres/", (req, res) -> genre.list(req, res));
+        Spark.get("/user", (req, res) -> user.detail(req, res, "launch"));
+        Spark.post("user/updateEmail", (req, res) -> user.detail(req, res, "updateEmail"));
+        Spark.post("user/updatePassword", (req, res) -> user.detail(req, res, "updatePassword"));
+        Spark.get("/user/delete", (req, res) -> user.delete(req, res));
         Spark.get("/medias/:id", (req, res) -> media.detail(req, res));
         Spark.get("/medias/", (req, res) -> media.list(req, res));
         Spark.get("/contact", (req, res) -> contact.display(req, res));

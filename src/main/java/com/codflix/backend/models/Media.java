@@ -1,5 +1,6 @@
 package com.codflix.backend.models;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -95,6 +96,12 @@ public class Media {
 
     public Date getReleaseDate() {
         return releaseDate;
+    }
+
+    public String getReleaseDateString() {
+        String pattern = "dd MMMMM yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        return simpleDateFormat.format(releaseDate);
     }
 
     public void setReleaseDate(Date releaseDate) {

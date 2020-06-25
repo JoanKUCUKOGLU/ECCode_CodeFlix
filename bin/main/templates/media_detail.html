@@ -10,17 +10,24 @@
 </div>
 <div>$media.getSummary()</div>
 
+#if($media.getTypeId() == 1) 
+    <div id="player" src ="$media.getTrailerUrl()"></div>
+#end
+
+#if($media.getTypeId() == 2) 
+    <div id="player" style="display: none;"></div>
+#end
 
 <div>
     #foreach($saison in $saisons)
         <div>Saison $saison[0].getSaisonIndex()</div>
         <div class="media-list">
             #foreach($episode in $saison)
-                <a class="item" href="#">
+                <div class="item" onclick="launchMedia('$episode.getId()', '0', 'SERIE', '$episode.getUrl()')">
                     <div class="title">
                         $episode.getEpisodeIndex() | $episode.getName() - $episode.getDurationString()
                     </div>
-                </a>
+                </div>
             #end
         </div>
     #end

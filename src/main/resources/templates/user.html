@@ -1,0 +1,65 @@
+#parse("dashboard.html")
+#@mainLayout()
+
+<div>
+    <form method="POST" action="/user/updateEmail" class="custom-form">
+    
+        <div>Changer votre adresse mail :</div>
+
+        <div class="form-group">
+            <label for="email">Adresse email</label>
+            <input type="email" name="email" value="$currentUser.getEmail()" id="email" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Veuillez entrer votre mot de passe afin de valider votre changement d'email</label>
+            <input type="password" name="password" id="password" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-6">
+                <input type="submit" name="Valider" class="btn btn-block bg-red" />
+            </div>
+        </div>
+
+        <span class="error-msg">
+        </span>
+    </form>
+
+
+    <form method="POST" action="/user/updatePassword" class="custom-form">
+    
+        <div>Changer votre mot de passe :</div>
+
+        <div class="form-group">
+            <label for="old_password">Ancien mot de passe</label>
+            <input type="password" name="old_password" id="old_password" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="new_password">Nouveau mot de passe</label>
+            <input type="password" name="new_password" id="new_password" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="new_password_confirmation">Confirmez votre nouveau mot de passe</label>
+            <input type="password" name="new_password_confirmation" id="new_password_confirmation" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-6">
+                <input type="submit" name="Valider" class="btn btn-block bg-red" />
+            </div>
+        </div>
+
+        <span class="error-msg">
+        </span>
+    </form>
+
+    <div class="form-group">
+        <div class="col-md-6">
+            <div class="col-md-6"><a href="/user/delete" class="btn btn-block bg-red">Supprimer votre compte</a></div>
+        </div>
+    </div>
+</div>
+#end
